@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:netflix_clone/screen/login.dart';
+import 'package:netflix_clone/screens/auth/join_screen.dart';
+import 'package:netflix_clone/screens/auth/login_screen.dart';
 import 'package:netflix_clone/styles/constans.dart';
 
 class WelcomeScreen extends StatelessWidget {
@@ -11,35 +12,27 @@ class WelcomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       extendBodyBehindAppBar: true,
-      backgroundColor: Colors.black,
       appBar: AppBar(
+        centerTitle: false,
         //backgroundColor: Colors.transparent,
         backgroundColor: const Color(0x44000000),
         elevation: 0,
-        title: const Text(
-          'NETFLIX',
-          style: TextStyle(color: Colors.red, fontSize: 30.0),
-        ),
+        title: Image.asset('images/netflix_logo.png',width: 120,),
         actions: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: TextButton(
-              onPressed: () {},
-              child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
-                decoration: BoxDecoration(
-                  color: const Color(0xffe50914),
-                  borderRadius: BorderRadius.circular(5.0),
-                ),
-                child: TextButton(
-                  onPressed: (){
-                    Navigator.pushNamed(context, LoginScreen.id);
-                  },
-                  child: const Text(
-                    '로그인',
-                    style: TextStyle(color: Colors.white, fontSize: 15.0),
-                  ),
-                ),
+          TextButton(
+            onPressed: () {
+              Navigator.pushNamed(context, LoginScreen.id);
+            },
+            child: Container(
+              padding:
+                  const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
+              decoration: BoxDecoration(
+                color: const Color(0xffe50914),
+                borderRadius: BorderRadius.circular(5.0),
+              ),
+              child: const Text(
+                '로그인',
+                style: TextStyle(color: Colors.white, fontSize: 18.0),
               ),
             ),
           ),
@@ -52,7 +45,8 @@ class WelcomeScreen extends StatelessWidget {
               opacity: 0.6,
               child: Container(
                 width: double.infinity,
-                height: MediaQuery.of(context).size.height * 0.7, // 디바이스 높이의 70%
+                height:
+                    MediaQuery.of(context).size.height * 0.7, // 디바이스 높이의 70%
                 decoration: const BoxDecoration(
                   image: DecorationImage(
                     fit: BoxFit.cover,
@@ -86,7 +80,9 @@ class WelcomeScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 50.0),
                   TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.pushNamed(context, JoinScreen.id);
+                    },
                     child: Container(
                       padding: const EdgeInsets.symmetric(
                           vertical: 10.0, horizontal: 20.0),
