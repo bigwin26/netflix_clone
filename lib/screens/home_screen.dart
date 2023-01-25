@@ -7,7 +7,6 @@ import 'dart:math';
 import 'dart:convert' as convert;
 import 'package:http/http.dart' as http;
 
-
 class HomeScreen extends StatefulWidget {
   static String id = 'home_screen';
 
@@ -31,10 +30,9 @@ class _HomeScreenState extends State<HomeScreen> {
     getUpcomingPlayList();
   }
 
-
   void getNowPlayList() async {
     var url = Uri.https('api.themoviedb.org', '/3/movie/now_playing',
-        {'api_key': '248a52d680518fd97f6e7be12c21157d','language':'ko'});
+        {'api_key': '248a52d680518fd97f6e7be12c21157d', 'language': 'ko'});
 
     // Await the http get response, then decode the json-formatted response.
     var response = await http.get(url);
@@ -52,13 +50,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void getUpcomingPlayList() async {
     var url = Uri.https('api.themoviedb.org', '/3/movie/upcoming',
-        {'api_key': '248a52d680518fd97f6e7be12c21157d','language':'ko'});
+        {'api_key': '248a52d680518fd97f6e7be12c21157d', 'language': 'ko'});
 
     // Await the http get response, then decode the json-formatted response.
     var response = await http.get(url);
     if (response.statusCode == 200) {
       var jsonResponse =
-      convert.jsonDecode(response.body) as Map<String, dynamic>;
+          convert.jsonDecode(response.body) as Map<String, dynamic>;
       print('getUpcomingPlayList status: ${jsonResponse}.');
       _upCommingList = MovieList.fromJson(jsonResponse);
       setState(() {});
@@ -66,7 +64,6 @@ class _HomeScreenState extends State<HomeScreen> {
       print('getUpcomingPlayList status: ${response.statusCode}.');
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -146,13 +143,20 @@ class _HomeScreenState extends State<HomeScreen> {
                               return Padding(
                                 padding: const EdgeInsets.symmetric(
                                     vertical: 0, horizontal: 5),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(8.0),
-                                  child: Image.network(
-                                    'https://image.tmdb.org/t/p/original${_nowPlayList?.results[index].posterPath}',
-                                    width: 120,
-                                    height: 175,
-                                    fit: BoxFit.fill,
+                                child: GestureDetector(
+                                  onTap: () {
+                                    showModal(
+                                        context: context,
+                                        movie: _nowPlayList?.results[index]);
+                                  },
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(8.0),
+                                    child: Image.network(
+                                      'https://image.tmdb.org/t/p/original${_nowPlayList?.results[index].posterPath}',
+                                      width: 120,
+                                      height: 175,
+                                      fit: BoxFit.fill,
+                                    ),
                                   ),
                                 ),
                               );
@@ -173,26 +177,33 @@ class _HomeScreenState extends State<HomeScreen> {
                     height: 175,
                     child: _upCommingList?.results != null
                         ? ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: _upCommingList?.results.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 0, horizontal: 5),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(8.0),
-                              child: Image.network(
-                                'https://image.tmdb.org/t/p/original${_upCommingList?.results[index].posterPath}',
-                                width: 120,
-                                height: 175,
-                                fit: BoxFit.fill,
-                              ),
-                            ),
-                          );
-                        })
+                            scrollDirection: Axis.horizontal,
+                            itemCount: _upCommingList?.results.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 0, horizontal: 5),
+                                child: GestureDetector(
+                                  onTap: () {
+                                    showModal(
+                                        context: context,
+                                        movie: _upCommingList?.results[index]);
+                                  },
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(8.0),
+                                    child: Image.network(
+                                      'https://image.tmdb.org/t/p/original${_upCommingList?.results[index].posterPath}',
+                                      width: 120,
+                                      height: 175,
+                                      fit: BoxFit.fill,
+                                    ),
+                                  ),
+                                ),
+                              );
+                            })
                         : SizedBox(
-                      height: 10,
-                    ),
+                            height: 10,
+                          ),
                   ),
                   SizedBox(
                     height: 50,
@@ -202,4 +213,55 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
     );
   }
+}
+
+//포스터 클릭시 상세정보 모달
+void showModal({required context, required movie}) {
+  showModalBottomSheet(
+    backgroundColor: const Color(0x44000000),
+    context: context,
+    builder: (BuildContext context) {
+      return Container(
+        height: MediaQuery.of(context).size.height * 0.3,
+        decoration: BoxDecoration(
+          color: Colors.grey[800],
+          borderRadius: const BorderRadius.vertical(
+            top: Radius.circular(20.0),
+            bottom: Radius.circular(0),
+          ),
+        ),
+        child: Center(
+          child: Column(
+            children: <Widget>[
+              Flexible(
+                flex: 3,
+                fit: FlexFit.loose,
+                child: Row(
+                  children: [
+                    Image.network(
+                      'https://image.tmdb.org/t/p/original${movie.posterPath}',
+                    ),
+                    Text('${movie!.title}'),
+                  ],
+                ),
+              ),
+              Flexible(
+                flex: 2,
+                fit: FlexFit.loose,
+                child: Row(
+                  children: [
+                    Text('${movie!.title}'),
+                  ],
+                ),
+              ),
+              // ElevatedButton(
+              //   child: const Text('Close BottomSheet'),
+              //   onPressed: () => Navigator.pop(context),
+              // ),
+            ],
+          ),
+        ),
+      );
+    },
+  );
 }
