@@ -1,61 +1,5 @@
-class NowPlayList {
-  NowPlayList({
-    required this.dates,
-    required this.page,
-    required this.results,
-    required this.totalPages,
-    required this.totalResults,
-  });
-  late final Dates dates;
-  late final int page;
-  late final List<Results> results;
-  late final int totalPages;
-  late final int totalResults;
-
-  NowPlayList.fromJson(Map<String, dynamic> json){
-    dates = Dates.fromJson(json['dates']);
-    page = json['page'];
-    results = List.from(json['results']).map((e)=>Results.fromJson(e)).toList();
-    totalPages = json['total_pages'];
-    totalResults = json['total_results'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final _data = <String, dynamic>{};
-    _data['dates'] = dates.toJson();
-    _data['page'] = page;
-    _data['results'] = results.map((e)=>e.toJson()).toList();
-    _data['total_pages'] = totalPages;
-    _data['total_results'] = totalResults;
-    return _data;
-  }
-
-
-}
-
-class Dates {
-  Dates({
-    required this.maximum,
-    required this.minimum,
-  });
-  late final String maximum;
-  late final String minimum;
-
-  Dates.fromJson(Map<String, dynamic> json){
-    maximum = json['maximum'];
-    minimum = json['minimum'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final _data = <String, dynamic>{};
-    _data['maximum'] = maximum;
-    _data['minimum'] = minimum;
-    return _data;
-  }
-}
-
-class Results {
-  Results({
+class Movie {
+  Movie({
     required this.adult,
     required this.backdropPath,
     required this.genreIds,
@@ -71,6 +15,7 @@ class Results {
     required this.voteAverage,
     required this.voteCount,
   });
+
   late final bool adult;
   late final String backdropPath;
   late final List<int> genreIds;
@@ -86,10 +31,10 @@ class Results {
   late final double voteAverage;
   late final int voteCount;
 
-  Results.fromJson(Map<String, dynamic> json){
+  Movie.fromJson(Map<String, dynamic> json) {
     adult = json['adult'];
-    backdropPath = json['backdrop_path'];
-    genreIds = List.castFrom<dynamic, int>(json['genre_ids']);
+    backdropPath = json['backdrop_path'] ?? '';
+    genreIds = List.castFrom<dynamic, int>(json['genre_ids'] ?? []);
     id = json['id'];
     originalLanguage = json['original_language'];
     originalTitle = json['original_title'];
@@ -121,6 +66,4 @@ class Results {
     _data['vote_count'] = voteCount;
     return _data;
   }
-
-
 }

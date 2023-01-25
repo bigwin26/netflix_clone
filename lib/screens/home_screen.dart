@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:netflix_clone/models/NowPlayList.dart';
+import 'package:netflix_clone/models/MovieList.dart';
 import 'package:netflix_clone/styles/constans.dart';
+
+import 'dart:math';
 
 import 'dart:convert' as convert;
 import 'package:http/http.dart' as http;
+
 
 class HomeScreen extends StatefulWidget {
   static String id = 'home_screen';
@@ -15,34 +18,55 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  NowPlayList? _nowPlayList;
-  Results? _results;
+  MovieList? _nowPlayList;
+  MovieList? _upCommingList;
+  Random random = Random();
+  int _randomNumber = 0;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     getNowPlayList();
+    getUpcomingPlayList();
   }
 
- void getNowPlayList() async {
-    print('hihi');
-    var url = Uri.https('api.themoviedb.org', '/3/movie/now_playing', {'api_key': '248a52d680518fd97f6e7be12c21157d'});
+
+  void getNowPlayList() async {
+    var url = Uri.https('api.themoviedb.org', '/3/movie/now_playing',
+        {'api_key': '248a52d680518fd97f6e7be12c21157d','language':'ko'});
+
+    // Await the http get response, then decode the json-formatted response.
+    var response = await http.get(url);
+    if (response.statusCode == 200) {
+      var jsonResponse =
+          convert.jsonDecode(response.body) as Map<String, dynamic>;
+      print('getNowPlayList status: ${jsonResponse}.');
+      _nowPlayList = MovieList.fromJson(jsonResponse);
+      _randomNumber = random.nextInt(jsonResponse['results'].length);
+      setState(() {});
+    } else {
+      print('getNowPlayList status: ${response.statusCode}.');
+    }
+  }
+
+  void getUpcomingPlayList() async {
+    var url = Uri.https('api.themoviedb.org', '/3/movie/upcoming',
+        {'api_key': '248a52d680518fd97f6e7be12c21157d','language':'ko'});
 
     // Await the http get response, then decode the json-formatted response.
     var response = await http.get(url);
     if (response.statusCode == 200) {
       var jsonResponse =
       convert.jsonDecode(response.body) as Map<String, dynamic>;
-      print('getNowPlayList status: ${response.statusCode}.');
-      _nowPlayList = NowPlayList.fromJson(jsonResponse);
-      setState(() {
-
-      });
+      print('getUpcomingPlayList status: ${jsonResponse}.');
+      _upCommingList = MovieList.fromJson(jsonResponse);
+      setState(() {});
     } else {
-      print('getNowPlayList status: ${response.statusCode}.');
+      print('getUpcomingPlayList status: ${response.statusCode}.');
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -59,191 +83,123 @@ class _HomeScreenState extends State<HomeScreen> {
           width: 60,
         ),
       ),
-      body: _nowPlayList == null ? Text('null') : SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Stack(
-              alignment: Alignment.bottomCenter,
-              children: [
-                Image.network(
-                    'https://image.tmdb.org/t/p/original${_nowPlayList?.results[0].posterPath}'),
-                Container(
-                  padding:
-                  EdgeInsets.symmetric(vertical: 20.0, horizontal: 10.0),
-                  child: Column(
+      body: _nowPlayList == null
+          ? Text('null')
+          : SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Stack(
+                    alignment: Alignment.bottomCenter,
                     children: [
-                      Text(
-                        'Puss in Boots: The Last Wish',
-                        style: kTextDecoration.copyWith(
-                            fontSize: 25.0, fontWeight: FontWeight.bold),
-                        textAlign: TextAlign.center,
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text('스릴있는'),
-                        ],
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text('내가 찜한 콘텐츠'),
-                        ],
+                      Image.network(
+                          'https://image.tmdb.org/t/p/original${_nowPlayList?.results[_randomNumber].posterPath}'),
+                      Container(
+                        padding: EdgeInsets.symmetric(
+                            vertical: 20.0, horizontal: 10.0),
+                        child: Column(
+                          children: [
+                            Text(
+                              '${_nowPlayList?.results[_randomNumber].title}',
+                              style: kTextDecoration.copyWith(
+                                  fontSize: 25.0, fontWeight: FontWeight.bold),
+                              textAlign: TextAlign.center,
+                            ),
+                            SizedBox(
+                              height: 10,
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text('스릴있는'),
+                              ],
+                            ),
+                            SizedBox(
+                              height: 10,
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text('내가 찜한 콘텐츠'),
+                              ],
+                            )
+                          ],
+                        ),
                       )
                     ],
                   ),
-                )
-              ],
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            Text(
-              '다시보기 추천 콘텐츠',
-              style: kTextDecoration.copyWith(
-                  fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding:
-                    const EdgeInsets.symmetric(vertical: 0, horizontal: 5),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(8.0),
-                      child: Image.network(
-                        'https://image.tmdb.org/t/p/original/1NqwE6LP9IEdOZ57NCT51ftHtWT.jpg',
-                        width: 120,
-                        height: 175,
-                        fit: BoxFit.fill,
-                      ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  Text(
+                    '현재 상영중인 영화',
+                    style: kTextDecoration.copyWith(
+                        fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(
+                    height: 175,
+                    child: _nowPlayList?.results != null
+                        ? ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            itemCount: _nowPlayList?.results.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 0, horizontal: 5),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                  child: Image.network(
+                                    'https://image.tmdb.org/t/p/original${_nowPlayList?.results[index].posterPath}',
+                                    width: 120,
+                                    height: 175,
+                                    fit: BoxFit.fill,
+                                  ),
+                                ),
+                              );
+                            })
+                        : SizedBox(
+                            height: 10,
+                          ),
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  Text(
+                    '상영예정 영화',
+                    style: kTextDecoration.copyWith(
+                        fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(
+                    height: 175,
+                    child: _upCommingList?.results != null
+                        ? ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: _upCommingList?.results.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 0, horizontal: 5),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(8.0),
+                              child: Image.network(
+                                'https://image.tmdb.org/t/p/original${_upCommingList?.results[index].posterPath}',
+                                width: 120,
+                                height: 175,
+                                fit: BoxFit.fill,
+                              ),
+                            ),
+                          );
+                        })
+                        : SizedBox(
+                      height: 10,
                     ),
                   ),
-                  Padding(
-                    padding:
-                    const EdgeInsets.symmetric(vertical: 0, horizontal: 5),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(8.0),
-                      child: Image.network(
-                        'https://image.tmdb.org/t/p/original/1NqwE6LP9IEdOZ57NCT51ftHtWT.jpg',
-                        width: 120,
-                        height: 175,
-                        fit: BoxFit.fill,
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding:
-                    const EdgeInsets.symmetric(vertical: 0, horizontal: 5),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(8.0),
-                      child: Image.network(
-                        'https://image.tmdb.org/t/p/original/1NqwE6LP9IEdOZ57NCT51ftHtWT.jpg',
-                        width: 120,
-                        height: 175,
-                        fit: BoxFit.fill,
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding:
-                    const EdgeInsets.symmetric(vertical: 0, horizontal: 5),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(8.0),
-                      child: Image.network(
-                        'https://image.tmdb.org/t/p/original/1NqwE6LP9IEdOZ57NCT51ftHtWT.jpg',
-                        width: 120,
-                        height: 175,
-                        fit: BoxFit.fill,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            Text(
-              '다시보기 추천 콘텐츠',
-              style: kTextDecoration.copyWith(
-                  fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding:
-                    const EdgeInsets.symmetric(vertical: 0, horizontal: 5),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(8.0),
-                      child: Image.network(
-                        'https://image.tmdb.org/t/p/original/1NqwE6LP9IEdOZ57NCT51ftHtWT.jpg',
-                        width: 120,
-                        height: 175,
-                        fit: BoxFit.fill,
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding:
-                    const EdgeInsets.symmetric(vertical: 0, horizontal: 5),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(8.0),
-                      child: Image.network(
-                        'https://image.tmdb.org/t/p/original/1NqwE6LP9IEdOZ57NCT51ftHtWT.jpg',
-                        width: 120,
-                        height: 175,
-                        fit: BoxFit.fill,
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding:
-                    const EdgeInsets.symmetric(vertical: 0, horizontal: 5),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(8.0),
-                      child: Image.network(
-                        'https://image.tmdb.org/t/p/original/1NqwE6LP9IEdOZ57NCT51ftHtWT.jpg',
-                        width: 120,
-                        height: 175,
-                        fit: BoxFit.fill,
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding:
-                    const EdgeInsets.symmetric(vertical: 0, horizontal: 5),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(8.0),
-                      child: Image.network(
-                        'https://image.tmdb.org/t/p/original/1NqwE6LP9IEdOZ57NCT51ftHtWT.jpg',
-                        width: 120,
-                        height: 175,
-                        fit: BoxFit.fill,
-                      ),
-                    ),
+                  SizedBox(
+                    height: 50,
                   ),
                 ],
               ),
             ),
-            SizedBox(
-              height: 50,
-            ),
-          ],
-        ),
-      ),
     );
   }
 }
