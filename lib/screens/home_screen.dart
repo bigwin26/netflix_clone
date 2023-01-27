@@ -7,6 +7,11 @@ import 'dart:math';
 import 'dart:convert' as convert;
 import 'package:http/http.dart' as http;
 
+//!!-ListView는 화면밖에 있는 부분은 렌더링을 하지않고, 화면안에 들어오면 렌더링을 하기시작.(성능적으로 유리).
+//!!-SingleChildScrollView는 화면밖에 있는 부분도 렌더링함.
+
+const String image_url = 'https://image.tmdb.org/t/p/original';
+
 class HomeScreen extends StatefulWidget {
   static String id = 'home_screen';
 
@@ -67,7 +72,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    print('hihiyoyo $_nowPlayList ?? null');
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
@@ -81,7 +85,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
       body: _nowPlayList == null
-          ? Text('null')
+          ? const Text('null')
           : SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -90,9 +94,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     alignment: Alignment.bottomCenter,
                     children: [
                       Image.network(
-                          'https://image.tmdb.org/t/p/original${_nowPlayList?.results[_randomNumber].posterPath}'),
+                          '$image_url${_nowPlayList?.results[_randomNumber].posterPath}'),
                       Container(
-                        padding: EdgeInsets.symmetric(
+                        padding: const EdgeInsets.symmetric(
                             vertical: 20.0, horizontal: 10.0),
                         child: Column(
                           children: [
@@ -102,21 +106,21 @@ class _HomeScreenState extends State<HomeScreen> {
                                   fontSize: 25.0, fontWeight: FontWeight.bold),
                               textAlign: TextAlign.center,
                             ),
-                            SizedBox(
+                            const SizedBox(
                               height: 10,
                             ),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
+                              children: const [
                                 Text('스릴있는'),
                               ],
                             ),
-                            SizedBox(
+                            const SizedBox(
                               height: 10,
                             ),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
+                              children: const [
                                 Text('내가 찜한 콘텐츠'),
                               ],
                             )
@@ -125,7 +129,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       )
                     ],
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 20,
                   ),
                   Text(
@@ -135,37 +139,65 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   SizedBox(
                     height: 175,
-                    child: _nowPlayList?.results != null
-                        ? ListView.builder(
-                            scrollDirection: Axis.horizontal,
-                            itemCount: _nowPlayList?.results.length,
-                            itemBuilder: (BuildContext context, int index) {
-                              return Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    vertical: 0, horizontal: 5),
-                                child: GestureDetector(
-                                  onTap: () {
-                                    showModal(
-                                        context: context,
-                                        movie: _nowPlayList?.results[index]);
-                                  },
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(8.0),
-                                    child: Image.network(
-                                      'https://image.tmdb.org/t/p/original${_nowPlayList?.results[index].posterPath}',
-                                      width: 120,
-                                      height: 175,
-                                      fit: BoxFit.fill,
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: _nowPlayList!.results
+                            .map<Widget>((movie) => Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 0, horizontal: 5),
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      showModal(context: context, movie: movie);
+                                    },
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                      child: Image.network(
+                                        '$image_url${movie.posterPath}',
+                                        width: 120,
+                                        height: 175,
+                                        fit: BoxFit.fill,
+                                      ),
                                     ),
                                   ),
-                                ),
-                              );
-                            })
-                        : SizedBox(
-                            height: 10,
-                          ),
+                                ))
+                            .toList(),
+                      ),
+                    ),
                   ),
-                  SizedBox(
+                  // SizedBox(
+                  //   height: 175,
+                  //   child: _nowPlayList?.results != null
+                  //       ? ListView.builder(
+                  //           scrollDirection: Axis.horizontal,
+                  //           itemCount: _nowPlayList?.results.length,
+                  //           itemBuilder: (BuildContext context, int index) {
+                  //             return Padding(
+                  //               padding: const EdgeInsets.symmetric(
+                  //                   vertical: 0, horizontal: 5),
+                  //               child: GestureDetector(
+                  //                 onTap: () {
+                  //                   showModal(
+                  //                       context: context,
+                  //                       movie: _nowPlayList?.results[index]);
+                  //                 },
+                  //                 child: ClipRRect(
+                  //                   borderRadius: BorderRadius.circular(8.0),
+                  //                   child: Image.network(
+                  //                     '$image_url${_nowPlayList?.results[index].posterPath}',
+                  //                     width: 120,
+                  //                     height: 175,
+                  //                     fit: BoxFit.fill,
+                  //                   ),
+                  //                 ),
+                  //               ),
+                  //             );
+                  //           })
+                  //       : SizedBox(
+                  //           height: 10,
+                  //         ),
+                  // ),
+                  const SizedBox(
                     height: 20,
                   ),
                   Text(
@@ -175,37 +207,33 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   SizedBox(
                     height: 175,
-                    child: _upCommingList?.results != null
-                        ? ListView.builder(
-                            scrollDirection: Axis.horizontal,
-                            itemCount: _upCommingList?.results.length,
-                            itemBuilder: (BuildContext context, int index) {
-                              return Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    vertical: 0, horizontal: 5),
-                                child: GestureDetector(
-                                  onTap: () {
-                                    showModal(
-                                        context: context,
-                                        movie: _upCommingList?.results[index]);
-                                  },
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(8.0),
-                                    child: Image.network(
-                                      'https://image.tmdb.org/t/p/original${_upCommingList?.results[index].posterPath}',
-                                      width: 120,
-                                      height: 175,
-                                      fit: BoxFit.fill,
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: _upCommingList!.results
+                            .map<Widget>((movie) => Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 0, horizontal: 5),
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      showModal(context: context, movie: movie);
+                                    },
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                      child: Image.network(
+                                        '$image_url${movie.posterPath}',
+                                        width: 120,
+                                        height: 175,
+                                        fit: BoxFit.fill,
+                                      ),
                                     ),
                                   ),
-                                ),
-                              );
-                            })
-                        : SizedBox(
-                            height: 10,
-                          ),
+                                ))
+                            .toList(),
+                      ),
+                    ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 50,
                   ),
                 ],
