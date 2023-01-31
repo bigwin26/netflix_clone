@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:netflix_clone/bloc/MovieBloc.dart';
 import 'package:netflix_clone/models/MovieList.dart';
+import 'package:netflix_clone/screens/movie/movie_screen.dart';
 import 'package:netflix_clone/styles/constans.dart';
 
 import 'dart:math';
@@ -282,10 +284,13 @@ void showModal({required context, required movie}) {
                   ],
                 ),
               ),
-              // ElevatedButton(
-              //   child: const Text('Close BottomSheet'),
-              //   onPressed: () => Navigator.pop(context),
-              // ),
+              ElevatedButton(
+                child: const Text('Close BottomSheet',style: TextStyle(color: Colors.orange),),
+                onPressed: (){
+                  MovieBloc().getMovie(id: movie.id);
+                  Navigator.pushNamed(context, MovieScreen.id);
+                }
+              ),
             ],
           ),
         ),

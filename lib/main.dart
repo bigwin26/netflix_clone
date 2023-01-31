@@ -3,6 +3,7 @@ import 'package:netflix_clone/screens/auth/join_screen.dart';
 import 'package:netflix_clone/screens/auth/login_screen.dart';
 import 'package:netflix_clone/screens/auth/welcome_screen.dart';
 import 'package:netflix_clone/screens/home_screen.dart';
+import 'package:netflix_clone/screens/movie/movie_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -26,10 +27,11 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: WelcomeScreen.id,
       routes: {
-        WelcomeScreen.id: (context) => WelcomeScreen(),
-        LoginScreen.id: (context) => LoginScreen(),
-        JoinScreen.id: (context) => JoinScreen(),
-        HomeScreen.id: (context) => HomeScreen(),
+        WelcomeScreen.id: (context) => const WelcomeScreen(),
+        LoginScreen.id: (context) => const LoginScreen(),
+        JoinScreen.id: (context) => const JoinScreen(),
+        HomeScreen.id: (context) => const HomeScreen(),
+        MovieScreen.id: (context) => const MovieScreen(),
       },
     );
   }
