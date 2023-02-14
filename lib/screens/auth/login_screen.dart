@@ -27,7 +27,7 @@ class LoginScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                margin: EdgeInsets.symmetric(vertical: 16, horizontal: 0),
+                margin: const EdgeInsets.symmetric(vertical: 16, horizontal: 0),
                 child: Text(
                   '로그인',
                   style: kTextDecoration.copyWith(
@@ -37,19 +37,19 @@ class LoginScreen extends StatelessWidget {
                   textAlign: TextAlign.start,
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 20,
               ),
               inputBox(
                   type: TextInputType.emailAddress,
                   hintText: '이메일 주소를 입력해주세요.',
                   labelText: '이메일 주소'),
-              SizedBox(
+              const SizedBox(
                 height: 20,
               ),
               inputBox(
                   hintText: '비밀번호를 입력해주세요.', labelText: '비밀번호', secure: true),
-              SizedBox(
+              const SizedBox(
                 height: 60,
               ),
               Container(
@@ -85,7 +85,7 @@ Widget inputBox(
   return Container(
     decoration: BoxDecoration(
       borderRadius: BorderRadius.circular(5.0),
-      color: Color(0xff333333),
+      color: const Color(0xff333333),
     ),
     child: TextField(
       onChanged: (value) {

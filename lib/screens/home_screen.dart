@@ -1,5 +1,5 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:netflix_clone/bloc/MovieBloc.dart';
 import 'package:netflix_clone/models/MovieList.dart';
 import 'package:netflix_clone/screens/movie/movie_screen.dart';
 import 'package:netflix_clone/styles/constans.dart';
@@ -12,7 +12,7 @@ import 'package:http/http.dart' as http;
 //!!-ListView는 화면밖에 있는 부분은 렌더링을 하지않고, 화면안에 들어오면 렌더링을 하기시작.(성능적으로 유리).
 //!!-SingleChildScrollView는 화면밖에 있는 부분도 렌더링함.
 
-const String image_url = 'https://image.tmdb.org/t/p/original';
+const String imageUrl = 'https://image.tmdb.org/t/p/original';
 
 class HomeScreen extends StatefulWidget {
   static String id = 'home_screen';
@@ -86,8 +86,10 @@ class _HomeScreenState extends State<HomeScreen> {
           width: 60,
         ),
       ),
-      body: _nowPlayList == null
-          ? const Text('null')
+      body: (_nowPlayList == null || _upCommingList == null)
+          ? const Center(
+              child: CircularProgressIndicator(),
+            )
           : SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -95,8 +97,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   Stack(
                     alignment: Alignment.bottomCenter,
                     children: [
-                      Image.network(
-                          '$image_url${_nowPlayList?.results[_randomNumber].posterPath}'),
+                      CachedNetworkImage(
+                          imageUrl:
+                              '$imageUrl${_nowPlayList?.results[_randomNumber].posterPath}'),
+                      // Image.network(
+                      //     '$imageUrl${_nowPlayList?.results[_randomNumber].posterPath}'),
                       Container(
                         padding: const EdgeInsets.symmetric(
                             vertical: 20.0, horizontal: 10.0),
@@ -153,52 +158,29 @@ class _HomeScreenState extends State<HomeScreen> {
                                       showModal(context: context, movie: movie);
                                     },
                                     child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(8.0),
-                                      child: Image.network(
-                                        '$image_url${movie.posterPath}',
-                                        width: 120,
-                                        height: 175,
-                                        fit: BoxFit.fill,
-                                      ),
-                                    ),
+                                        borderRadius:
+                                            BorderRadius.circular(8.0),
+                                        child: CachedNetworkImage(
+                                          imageUrl:
+                                              '$imageUrl${movie.posterPath}',
+                                          width: 120,
+                                          height: 175,
+                                          fit: BoxFit.fill,
+                                        )
+
+                                        // child: Image.network(
+                                        //   '$imageUrl${movie.posterPath}',
+                                        //   width: 120,
+                                        //   height: 175,
+                                        //   fit: BoxFit.fill,
+                                        // ),
+                                        ),
                                   ),
                                 ))
                             .toList(),
                       ),
                     ),
                   ),
-                  // SizedBox(
-                  //   height: 175,
-                  //   child: _nowPlayList?.results != null
-                  //       ? ListView.builder(
-                  //           scrollDirection: Axis.horizontal,
-                  //           itemCount: _nowPlayList?.results.length,
-                  //           itemBuilder: (BuildContext context, int index) {
-                  //             return Padding(
-                  //               padding: const EdgeInsets.symmetric(
-                  //                   vertical: 0, horizontal: 5),
-                  //               child: GestureDetector(
-                  //                 onTap: () {
-                  //                   showModal(
-                  //                       context: context,
-                  //                       movie: _nowPlayList?.results[index]);
-                  //                 },
-                  //                 child: ClipRRect(
-                  //                   borderRadius: BorderRadius.circular(8.0),
-                  //                   child: Image.network(
-                  //                     '$image_url${_nowPlayList?.results[index].posterPath}',
-                  //                     width: 120,
-                  //                     height: 175,
-                  //                     fit: BoxFit.fill,
-                  //                   ),
-                  //                 ),
-                  //               ),
-                  //             );
-                  //           })
-                  //       : SizedBox(
-                  //           height: 10,
-                  //         ),
-                  // ),
                   const SizedBox(
                     height: 20,
                   ),
@@ -222,12 +204,19 @@ class _HomeScreenState extends State<HomeScreen> {
                                     },
                                     child: ClipRRect(
                                       borderRadius: BorderRadius.circular(8.0),
-                                      child: Image.network(
-                                        '$image_url${movie.posterPath}',
-                                        width: 120,
-                                        height: 175,
-                                        fit: BoxFit.fill,
-                                      ),
+                                        child: CachedNetworkImage(
+                                          imageUrl:
+                                          '$imageUrl${movie.posterPath}',
+                                          width: 120,
+                                          height: 175,
+                                          fit: BoxFit.fill,
+                                        ),
+                                      // child: Image.network(
+                                      //   '$imageUrl${movie.posterPath}',
+                                      //   width: 120,
+                                      //   height: 175,
+                                      //   fit: BoxFit.fill,
+                                      // ),
                                     ),
                                   ),
                                 ))
@@ -285,12 +274,16 @@ void showModal({required context, required movie}) {
                 ),
               ),
               ElevatedButton(
-                child: const Text('Close BottomSheet',style: TextStyle(color: Colors.orange),),
-                onPressed: (){
-                  MovieBloc().getMovie(id: movie.id);
-                  Navigator.pushNamed(context, MovieScreen.id);
-                }
-              ),
+                  child: const Text(
+                    'Close BottomSheet',
+                    style: TextStyle(color: Colors.orange),
+                  ),
+                  onPressed: () {
+                    //ovieBloc().getMovie(id: movie.id);
+                    Navigator.pop(context);
+                    movieBloc.setMovieId(movieId: movie.id);
+                    Navigator.pushNamed(context, MovieScreen.id);
+                  }),
             ],
           ),
         ),

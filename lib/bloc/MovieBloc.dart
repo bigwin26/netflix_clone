@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 
 class MovieBloc{
   Movie? _movie;
+  int id = 0;
 
   final _movieSubject = BehaviorSubject<Movie>();
 
@@ -26,6 +27,10 @@ class MovieBloc{
     } else {
       print('getNowPlayList status: ${response.statusCode}.');
     }
+  }
+
+  void setMovieId({movieId}){
+    id = movieId;
   }
 
   Stream<Movie> get movie$ => _movieSubject.stream;
