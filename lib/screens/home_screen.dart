@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:netflix_clone/etc/utilities.dart';
 import 'package:netflix_clone/models/MovieList.dart';
 import 'package:netflix_clone/screens/movie/movie_screen.dart';
 import 'package:netflix_clone/styles/constans.dart';
@@ -101,8 +102,6 @@ class _HomeScreenState extends State<HomeScreen> {
                       CachedNetworkImage(
                           imageUrl:
                               '$imageUrl${_nowPlayList?.results[_randomNumber].posterPath}'),
-                      // Image.network(
-                      //     '$imageUrl${_nowPlayList?.results[_randomNumber].posterPath}'),
                       Container(
                         padding: const EdgeInsets.symmetric(
                             vertical: 20.0, horizontal: 10.0),
@@ -119,9 +118,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
-                              children: const [
-                                Text('스릴있는'),
-                              ],
+                              children: _nowPlayList != null ? _nowPlayList!.results[_randomNumber].genreIds.map<Widget>((genre) => Text('${genreNames.firstWhere((element) => element['id'] == genre)['name']}')).toList() : [],
                             ),
                             const SizedBox(
                               height: 10,

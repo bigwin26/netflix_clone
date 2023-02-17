@@ -36,7 +36,7 @@ class _MovieScreenState extends State<MovieScreen> {
         stream: movieBloc.movie$,
         builder: (context, snapshot) {
           print('snapshot3: ${snapshot.hasData}');
-          if (snapshot.hasData) {
+          if (snapshot.hasData && !movieBloc.loading) {
             print('snapshot1: ${snapshot.data}');
             return Scaffold(
               appBar: AppBar(
