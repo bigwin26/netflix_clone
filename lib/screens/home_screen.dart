@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:netflix_clone/models/MovieList.dart';
 import 'package:netflix_clone/screens/movie/movie_screen.dart';
@@ -64,7 +65,7 @@ class _HomeScreenState extends State<HomeScreen> {
     if (response.statusCode == 200) {
       var jsonResponse =
           convert.jsonDecode(response.body) as Map<String, dynamic>;
-      print('getUpcomingPlayList status: ${jsonResponse}.');
+      print('getUpcomingPlayList status: $jsonResponse.');
       _upCommingList = MovieList.fromJson(jsonResponse);
       setState(() {});
     } else {
@@ -204,13 +205,13 @@ class _HomeScreenState extends State<HomeScreen> {
                                     },
                                     child: ClipRRect(
                                       borderRadius: BorderRadius.circular(8.0),
-                                        child: CachedNetworkImage(
-                                          imageUrl:
-                                          '$imageUrl${movie.posterPath}',
-                                          width: 120,
-                                          height: 175,
-                                          fit: BoxFit.fill,
-                                        ),
+                                      child: CachedNetworkImage(
+                                        imageUrl:
+                                            '$imageUrl${movie.posterPath}',
+                                        width: 120,
+                                        height: 175,
+                                        fit: BoxFit.fill,
+                                      ),
                                       // child: Image.network(
                                       //   '$imageUrl${movie.posterPath}',
                                       //   width: 120,
@@ -236,12 +237,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
 //포스터 클릭시 상세정보 모달
 void showModal({required context, required movie}) {
+  print('showmodal: ${movie.overview}');
   showModalBottomSheet(
     backgroundColor: const Color(0x44000000),
     context: context,
     builder: (BuildContext context) {
       return Container(
-        height: MediaQuery.of(context).size.height * 0.3,
+        padding: const EdgeInsets.all(15.0),
+        height: MediaQuery.of(context).size.height * 0.4,
         decoration: BoxDecoration(
           color: Colors.grey[800],
           borderRadius: const BorderRadius.vertical(
@@ -257,10 +260,34 @@ void showModal({required context, required movie}) {
                 fit: FlexFit.loose,
                 child: Row(
                   children: [
-                    Image.network(
-                      'https://image.tmdb.org/t/p/original${movie.posterPath}',
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(5.0),
+                      child: CachedNetworkImage(
+                        imageUrl:
+                            'https://image.tmdb.org/t/p/original${movie.posterPath}',
+                      ),
                     ),
-                    Text('${movie!.title}'),
+                    Flexible(
+                      fit: FlexFit.loose,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '${movie!.title}',
+                              style: const TextStyle(fontSize: 20.0),
+                            ),
+                            const SizedBox(
+                              height: 10.0,
+                            ),
+                            Text(
+                                movie.overview.length > 50 ? '${movie.overview.toString().substring(0, 50)}...' : '설명없음.'),
+                          ],
+                        ),
+                      ),
+                    )
                   ],
                 ),
               ),
@@ -268,22 +295,73 @@ void showModal({required context, required movie}) {
                 flex: 2,
                 fit: FlexFit.loose,
                 child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Text('${movie!.title}'),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: const [
+                        Icon(Icons.play_arrow_sharp),
+                        Text('재생')
+                      ],
+                    ),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: const [
+                        Icon(Icons.play_arrow_sharp),
+                        Text('재생')
+                      ],
+                    ),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: const [
+                        Icon(Icons.play_arrow_sharp),
+                        Text('재생')
+                      ],
+                    ),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: const [
+                        Icon(Icons.play_arrow_sharp),
+                        Text('재생')
+                      ],
+                    ),
                   ],
                 ),
               ),
-              ElevatedButton(
-                  child: const Text(
-                    'Close BottomSheet',
-                    style: TextStyle(color: Colors.orange),
+              Container(
+                padding: const EdgeInsets.symmetric(vertical: 20.0),
+                decoration: const BoxDecoration(
+                    border: Border(
+                  top: BorderSide(
+                    // POINT
+                    color: Colors.white60,
+                    width: 1.0,
                   ),
-                  onPressed: () {
-                    //ovieBloc().getMovie(id: movie.id);
+                )),
+                child: GestureDetector(
+                  onTap: () {
                     Navigator.pop(context);
                     movieBloc.setMovieId(movieId: movie.id);
                     Navigator.pushNamed(context, MovieScreen.id);
-                  }),
+                  },
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: const [
+                          Icon(
+                            Icons.info_outline,
+                            color: Colors.white,
+                          ),
+                          Text('회차정보 및 상제정보')
+                        ],
+                      ),
+                      const Icon(Icons.arrow_forward_ios, color: Colors.white),
+                    ],
+                  ),
+                ),
+              )
             ],
           ),
         ),

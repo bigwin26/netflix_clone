@@ -31,6 +31,7 @@ class Movie {
   late final double voteAverage;
   late final int voteCount;
 
+
   Movie.fromJson(Map<String, dynamic> json) {
     adult = json['adult'];
     backdropPath = json['backdrop_path'] ?? '';
@@ -66,4 +67,5 @@ class Movie {
     _data['vote_count'] = voteCount;
     return _data;
   }
+
 }
